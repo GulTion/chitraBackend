@@ -3,12 +3,22 @@ const mongoose = require("mongoose");
 const express = require("express");
 const app = express();
 const http = require('http').Server(app);
-const io = require('socket.io')(http);
+const io = require('socket.io')(http,{
+  cors: {
+    origin: '*',
+  }
+});
 const cors = require('cors')
 
 const {Drawing, User, Line} = require("./Models/index")
 const {log} = console;
-
+app.use(function (req, res, next) {
+res.setHeader('Access-Control-Allow-Origin', '*');
+res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE');
+res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+res.setHeader('Access-Control-Allow-Credentials', true);
+next();
+});
 app.use(cors({origin:"*"}))
 function createDrawing({name,key, client}) {
   const drawing = new Drawing({name,key, timestamp:new Date() });
@@ -70,7 +80,7 @@ const subscribeForAllPublishLine = ({ client, drawingId})=>{
 // })
 
 // ServerConnections
-mongoose.connect("mongodb://localhost:27017/chitra", {useNewUrlParser: true}).then(e=>{
+mongoose.connect("mongodb+srv://gultion:pMDXt4uvHwgua5WJ@clientapi.zmhiz.mongodb.net/clientAPI?retryWrites=true&w=majority", {useNewUrlParser: true}).then(e=>{
 
     log("db is connected");
     // createDrawing({name:"MyDrawing"});
