@@ -9,6 +9,7 @@ const io = require('socket.io')(http,{
     origin: '*',
   }
 });
+
 const cors = require('cors')
 
 const {Drawing, User, Line} = require("./Models/index");
@@ -159,6 +160,29 @@ app.post("/drawing/get", (req, res)=>{
   }
 )
 
+})
+app.post("/drawing/all", (req, res)=>{
+  // const {id} = req.body;
+
+  Drawing.find({}, (err,e)=>{
+
+    res.send({success:true, list:e})
+  }
+)
+
+})
+
+app.post("/drawing/delete", (req, res)=>{
+  const {id, key} = req.body;
+  Drawing.deleteOne({_id:id}).then(e=>{
+    log(id);
+    Line.deleteMany({drawingId:id}).then(_e=>{
+      log(`trying to delelte`)
+      res.send({})
+    })
+    // res.send(e)
+  })
+  // res.send(e)
 })
 
 
