@@ -20,9 +20,9 @@ const {log} = console;
 app.use(bodyParser())
 app.use(cors({origin:"*"}))
 
-function createDrawing({name,key, client}) {
+function createDrawing({name,key,user, client}) {
   log(key)
-  const drawing = new Drawing({name,key, timestamp:new Date() });
+  const drawing = new Drawing({name,key,user, timestamp:new Date() });
     drawing.save().then(e=>{
       log(e);
     }).catch(err=>{
@@ -82,7 +82,7 @@ const subscribeForAllPublishLine = ({ client, drawingId})=>{
 // })
 
 // ServerConnections
-let monS = "mongodb+srv://gultion:pMDXt4uvHwgua5WJ@clientapi.zmhiz.mongodb.net/clientAPI?retryWrites=true&w=majority"
+let monS = "mongodb+srv://gultion:XgJeq87rgq7zrCU4@gultion.6cvhl.mongodb.net/chitr?retryWrites=true&w=majority"
 let monL = "mongodb://localhost:27017/chitra"
 mongoose.connect(monS, {useNewUrlParser: true}).then(e=>{
 
@@ -90,7 +90,7 @@ mongoose.connect(monS, {useNewUrlParser: true}).then(e=>{
     // createDrawing({name:"MyDrawing"});
     io.on("connect", (client) => {
       // client.on('subscribeForDrawings', ({key}) => subscribeForDrawing({client,key}));
-      client.on('createDrawing', ({name, key}) => createDrawing({name,key,client}));
+      client.on('createDrawing', ({name, key,user}) => createDrawing({name,user,key,client}));
       client.on('subscribeForDrawingList', ({key})=>subscribeForDrawingList({key,client}))
       client.on('publishLine', (line)=>{handlePublishLine({line})});
       client.on('subscribeForPublishLine', (drawingId)=>subscribeForPublishLine({client, drawingId}));
@@ -162,10 +162,10 @@ app.post("/drawing/get", (req, res)=>{
 
 })
 app.post("/drawing/all", (req, res)=>{
-  // const {id} = req.body;
-
-  Drawing.find({}, (err,e)=>{
-
+  const {id} = req.body;
+  log(id)
+  Drawing.find({'user':id}, (err,e)=>{
+log(e)
     res.send({success:true, list:e})
   }
 )

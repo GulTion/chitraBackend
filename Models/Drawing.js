@@ -8,7 +8,7 @@ const DrawingSchema = new Schema({
     required: [true, 'Need User name']
   },
   key:String,
-
+  user:String,
   timestamp:{
       type:Date
   }
