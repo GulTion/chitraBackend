@@ -82,9 +82,9 @@ const subscribeForAllPublishLine = ({ client, drawingId})=>{
 // })
 
 // ServerConnections
-let monS = "mongodb+srv://gultion:XgJeq87rgq7zrCU4@gultion.6cvhl.mongodb.net/chitr?retryWrites=true&w=majority"
+
 let monL = "mongodb://localhost:27017/chitra"
-mongoose.connect(monS, {useNewUrlParser: true}).then(e=>{
+mongoose.connect(monL, {useNewUrlParser: true}).then(e=>{
 
     log("db is connected");
     // createDrawing({name:"MyDrawing"});
