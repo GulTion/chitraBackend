@@ -117,7 +117,7 @@ const saveChitr = (data)=>{
 }
 
 // ServerConnections
-let monS = "mongodb+srv://gultion:XgJeq87rgq7zrCU4@gultion.6cvhl.mongodb.net/chitr?retryWrites=true&w=majority"
+let monS = process.env.mongo
 let monL = "mongodb://localhost:27017/chitra"
 mongoose.connect(monS, {useNewUrlParser: true}).then(e=>{
 
