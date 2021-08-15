@@ -12,7 +12,7 @@ const io = require('socket.io')(http,{
 
 const cors = require('cors')
 
-const {Drawing, User, Line} = require("./Models/index");
+const {Drawing, User, Line,Chitr} = require("./Models/index");
 const bodyParser = require("body-parser");
 const {log} = console;
 
@@ -77,7 +77,14 @@ const subscribeForAllPublishLine = ({ client, drawingId})=>{
 
 
 const subscribeForFabric = ({client, data})=>{
+  log(data)
   client.broadcast.emit(`giveMeCanvas:${data.drawingId}`, data.drawingId);
+  Chitr.findOne(data).then(doc=>{
+    if(doc){
+      client.emit(`hereMyCanvas:${data.drawingId}`, {json:doc.json, from:"server"})
+    }
+    log({doc})
+  })
 
 }
 
@@ -87,7 +94,26 @@ const pushChange = ({client, data})=>{
   client.broadcast.emit(`pullChange:${data.drawingId}`, data.data)
 }
 const takeMyCanvas =({client, data})=>{
-  client.broadcast.emit(`hereMyCanvas:${data.id}`, data.canvas)
+  client.broadcast.emit(`hereMyCanvas:${data.id}`, {json:data.canvas, from:"socket"})
+}
+
+const saveChitr = (data)=>{
+
+  Drawing.findOne({_id:data.drawingId}).then(doc=>{
+
+    if(doc.user===data.key){
+      Chitr.findOneAndUpdate({drawingId:data.drawingId}, data).then(ch=>{
+        if(ch==null){
+          let chitr= new Chitr(data);
+          chitr.save()
+        }
+      })
+       
+
+    }
+  }).catch(err=>{
+    log(err)
+  })
 }
 
 // ServerConnections
@@ -108,6 +134,7 @@ mongoose.connect(monS, {useNewUrlParser: true}).then(e=>{
       client.on("pushChange", (data)=>pushChange({client, data}))
       client.on("subscribeForFabric", (data)=>subscribeForFabric({client, data}))
       client.on("takeMyCanvas", (data)=>takeMyCanvas({client, data}))
+      client.on("saveChitr", (data)=>saveChitr(data))
   })
 
 }).catch(e=>log({e}))
