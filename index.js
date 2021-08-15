@@ -76,15 +76,24 @@ const subscribeForAllPublishLine = ({ client, drawingId})=>{
 }
 
 
+const subscribeForFabric = ({client, data})=>{
+  client.broadcast.emit(`giveMeCanvas:${data.drawingId}`, data.drawingId);
 
-// Drawing.watch().on("change", (data)=>{
+}
 
-// })
+
+const pushChange = ({client, data})=>{
+  
+  client.broadcast.emit(`pullChange:${data.drawingId}`, data.data)
+}
+const takeMyCanvas =({client, data})=>{
+  client.broadcast.emit(`hereMyCanvas:${data.id}`, data.canvas)
+}
 
 // ServerConnections
-
+let monS = "mongodb+srv://gultion:XgJeq87rgq7zrCU4@gultion.6cvhl.mongodb.net/chitr?retryWrites=true&w=majority"
 let monL = "mongodb://localhost:27017/chitra"
-mongoose.connect(monL, {useNewUrlParser: true}).then(e=>{
+mongoose.connect(monS, {useNewUrlParser: true}).then(e=>{
 
     log("db is connected");
     // createDrawing({name:"MyDrawing"});
@@ -96,6 +105,9 @@ mongoose.connect(monL, {useNewUrlParser: true}).then(e=>{
       client.on('subscribeForPublishLine', (drawingId)=>subscribeForPublishLine({client, drawingId}));
       client.on('subscribeForAllPublishLine', (drawingId)=>subscribeForAllPublishLine({client, drawingId}));
       // client.on('getDrawingById', (id)=>getDrawingById({id, client}))
+      client.on("pushChange", (data)=>pushChange({client, data}))
+      client.on("subscribeForFabric", (data)=>subscribeForFabric({client, data}))
+      client.on("takeMyCanvas", (data)=>takeMyCanvas({client, data}))
   })
 
 }).catch(e=>log({e}))
