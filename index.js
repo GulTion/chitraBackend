@@ -117,7 +117,7 @@ const saveChitr = (data)=>{
 }
 
 // ServerConnections
-let monS = process.env.mongo
+let monS = "mongodb+srv://gultion:XgJeq87rgq7zrCU4@gultion.6cvhl.mongodb.net/chitr?retryWrites=true&w=majority"
 let monL = "mongodb://localhost:27017/chitra"
 mongoose.connect(monS, {useNewUrlParser: true}).then(e=>{
 
@@ -187,15 +187,21 @@ app.post("/auth/check", (req,res)=>{
 app.post("/drawing/get", (req, res)=>{
   const {id} = req.body;
 
-  Drawing.find({'_id':id}, (err,e)=>{
+  Drawing.findOne({'_id':id}, (err,e)=>{
+    if(e===undefined) {
+      res.send({success:false, message:"Can't FInd the Drawing"})
 
-    if(e.length==0){
+    }else{
+
+    
+    if(e===null){
       res.send({success:false, message:"Can't FInd the Drawing"})
     }else{
-      const k = e[0]
+      log({e})
+    
       log("fond")
-      res.send({success:true, name:k.name})
-    }
+      res.send({success:true, name:e.name})
+    }}
   }
 )
 
